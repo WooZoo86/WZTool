@@ -11,8 +11,8 @@ namespace WZToolLib.Utility.FileCompress
         static ZipHelper()
         {
             ZipHelper.Password = null;
-            ZipHelper.Block = 2048;
-            ZipHelper.Level = 5;
+            ZipHelper.BlockSize = 2048;
+            ZipHelper.CompressionLevel = 5;
             ZipHelper.OverWrite = true;
         }
 
@@ -21,28 +21,28 @@ namespace WZToolLib.Utility.FileCompress
         public static int Level {
             set
             {
-                if (0 == value) Level = 5;
+                if (0 == value) ZipHelper.CompressionLevel = 5;
             }
             get
             {
-                return Level;
+                return ZipHelper.CompressionLevel;
             }
         }
 
         public static int Block {
             set
             {
-                if (0 == value) Block = 2048;
+                if (0 == value) ZipHelper.BlockSize = 2048;
             }
             get
             {
-                return Block;
+                return ZipHelper.BlockSize;
             }
         }
 
         public static bool OverWrite { set; get; }
 
-        public bool ZipFile(string FileToZip, string ZipedFile = null)
+        public static bool ZipFile(string FileToZip, string ZipedFile = null)
         {
             if (!File.Exists(FileToZip))
             {
@@ -246,6 +246,7 @@ namespace WZToolLib.Utility.FileCompress
                         {
                             Directory.CreateDirectory(directoryName);
                         }
+
                         if (!string.IsNullOrEmpty(fileName))
                         {
                             if ((File.Exists(path) && ZipHelper.OverWrite) || (!File.Exists(path)))
@@ -273,7 +274,6 @@ namespace WZToolLib.Utility.FileCompress
                                     {
                                         fileStream.Flush();
                                         fileStream.Close();
-                                        zipInputStream.Close();
                                     }
                                 }
                             }
@@ -293,5 +293,7 @@ namespace WZToolLib.Utility.FileCompress
 
         public static List<string> FilesName = new List<string>();
         public static string ErrMsg = "No Error";
+        private static int BlockSize = 2048;
+        private static int CompressionLevel = 5;
     }
 }
