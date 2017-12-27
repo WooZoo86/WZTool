@@ -25,7 +25,7 @@ namespace WZToolLib.Reflect
                 Type type = this.assembly.GetType(fullClassName);
                 if (type == null)
                 {
-                    Console.WriteLine("tp is null");
+                    Console.WriteLine("type is null");
                     result = null;
                 }
                 else
@@ -43,6 +43,7 @@ namespace WZToolLib.Reflect
                     }
                 }
             }
+
             return result;
         }
 
