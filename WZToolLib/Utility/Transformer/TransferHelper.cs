@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WZToolLib.Utility.Transformer
 {
-    public class ValueTransformer
+    public class TransferHelepr
     {
         public static uint HexStrToUInt(string strValue)
         {
@@ -102,6 +102,7 @@ namespace WZToolLib.Utility.Transformer
         {
             int num = strValue.Length / 2;
             List<byte> list = new List<byte>();
+
             for (int i = 0; i < num; i++)
             {
                 byte item = (byte)Convert.ToInt32(strValue.Substring(i * 2, 2), 16);
@@ -112,42 +113,34 @@ namespace WZToolLib.Utility.Transformer
             return Encoding.ASCII.GetString(bytes);
         }
 
-        public static byte[] ASCII2HexStr(string strValue)
+        public static byte[] ASCII2Hex(string strValue)
         {
-            int length = strValue.Length;
             char[] chars = strValue.ToCharArray();
             return Encoding.ASCII.GetBytes(chars);
         }
 
-        public static string Reverse(string str)
+        public static string ASCIIToHexStr(string str)
         {
-            if (string.IsNullOrEmpty(str))
-            {
-                throw new ArgumentException("Invalid Argument");
-            }
-            StringBuilder stringBuilder = new StringBuilder(str.Length);
-            for (int i = str.Length - 1; i >= 0; i--)
-            {
-                stringBuilder.Append(str[i]);
-            }
-            return stringBuilder.ToString();
-        }
+            string text = "";
+            string result;
 
-        public static string Reverse(string str, int mode)
-        {
-            if (string.IsNullOrEmpty(str))
+            if (str == "")
             {
-                throw new ArgumentException("Invalid Argument");
+                result = "";
             }
-            StringBuilder stringBuilder = new StringBuilder(str.Length);
-            for (int i = str.Length - 1; i >= 0; i -= mode)
+            else
             {
-                for (int j = mode - 1; j >= 0; j--)
+                byte[] bytes = Encoding.Default.GetBytes(str);
+
+                for (int i = 0; i < bytes.Length; i++)
                 {
-                    stringBuilder.Append(str[i - j]);
+                    text += bytes[i].ToString("X2");
                 }
+
+                result = text;
             }
-            return stringBuilder.ToString();
+
+            return result;
         }
 
         public static string ToHexString(byte[] bytes)
@@ -160,12 +153,14 @@ namespace WZToolLib.Utility.Transformer
                 {
                     stringBuilder.Append(bytes[i].ToString("X2"));
                 }
+
                 result = stringBuilder.ToString();
             }
+
             return result;
         }
 
-        public static string To2HexString(string HexStr)
+        public static string HexStrToBinStr(string HexStr)
         {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < HexStr.Length; i++)
@@ -223,130 +218,14 @@ namespace WZToolLib.Utility.Transformer
                         text = "1111";
                         break;
                 }
+
                 stringBuilder.Append(text);
             }
+
             return stringBuilder.ToString();
         }
 
-        public static string HexStr2BCD(string retValue, int length)
-        {
-            List<byte> list = new List<byte>();
-            long num = Convert.ToInt64(retValue, 16);
-            for (int i = length - 1; i >= 0; i--)
-            {
-                long num2 = num % 10L;
-                list.Add(Convert.ToByte((num2 / 10L << 4) + (num2 % 10L & 15L)));
-                num /= 100L;
-            }
-            Console.WriteLine(list.ToArray().ToString());
-            return ValueTransformer.ToHexString(list.ToArray());
-        }
-
-        public static string HexStr2BCD_Standard(string retValue, int length)
-        {
-            string text = string.Empty;
-            string value = string.Empty;
-            for (int i = 0; i < length; i++)
-            {
-                value = retValue.Substring(i, 1);
-                int num = Convert.ToInt32(value, 16);
-                text += (num / 10 * 10 + num % 10).ToString();
-            }
-            Console.WriteLine(text);
-            return text;
-        }
-
-        public static byte[] HexStr2Byte(string strValue)
-        {
-            if (strValue.IndexOf("x") == 1)
-            {
-                strValue = strValue.Substring(2);
-            }
-            int num = strValue.Length / 2;
-            List<byte> list = new List<byte>();
-            for (int i = 0; i < num; i++)
-            {
-                byte item = (byte)Convert.ToInt32(strValue.Substring(i * 2, 2), 16);
-                list.Add(item);
-            }
-            return list.ToArray();
-        }
-
-        public static byte[] HexStr2Byte(string strValue, int maxLength)
-        {
-            if (strValue.IndexOf("x") == 1)
-            {
-                strValue = strValue.Substring(2);
-            }
-            int length = strValue.Length;
-            byte[] result;
-            if (length > maxLength)
-            {
-                result = null;
-            }
-            else
-            {
-                for (int i = 0; i < maxLength - length; i++)
-                {
-                    strValue = "0" + strValue;
-                }
-                int num = strValue.Length / 2;
-                List<byte> list = new List<byte>();
-                for (int i = 0; i < num; i++)
-                {
-                    byte item = (byte)Convert.ToInt32(strValue.Substring(i * 2, 2), 16);
-                    list.Add(item);
-                }
-                byte[] array = list.ToArray();
-                result = array;
-            }
-            return result;
-        }
-
-        public static double HexToFloat(string byteStr)
-        {
-            double num = 0.0;
-            int value = Convert.ToInt32(byteStr, 16);
-            string text = Convert.ToString(value, 2);
-            for (int i = 0; i < 32; i++)
-            {
-                if (text.Length < i + 1)
-                {
-                    text = "0" + text;
-                }
-            }
-            double y = (text.Substring(0, 1) == "0") ? 0.0 : 1.0;
-            string value2 = text.Substring(1, 8);
-            double y2 = (double)(Convert.ToInt32(value2, 2) - 127);
-            double num2 = -1.0;
-            for (int i = 9; i < 32; i++)
-            {
-                if (text.Substring(i, 1) == "1")
-                {
-                    double num3 = 1.0;
-                    num += num3 * Math.Pow(2.0, num2);
-                }
-                num2 -= 1.0;
-            }
-            double value3 = Math.Pow(-1.0, y) * (1.0 + num) * Math.Pow(2.0, y2);
-            return Math.Round(value3, 2);
-        }
-
-        private string IntegerToHexstr(int intaddr)
-        {
-            string[] array = new string[4];
-            array[0] = (intaddr & 255).ToString("X2");
-            for (int i = 1; i < 4; i++)
-            {
-                intaddr >>= 8;
-                string[] array2;
-                IntPtr intPtr;
-                (array2 = array)[(int)(intPtr = (IntPtr)i)] = array2[(int)intPtr] + (intaddr & 255).ToString("X2");
-            }
-            return array[3] + array[2] + array[1] + array[0];
-        }
-
-        public static string The2HexstrTo16Hexstr(string str)
+        public static string BinStrToHexStr(string str)
         {
             int num = str.Length % 8;
             if (num != 0)
@@ -356,6 +235,7 @@ namespace WZToolLib.Utility.Transformer
                     str = "0" + str;
                 }
             }
+
             string text = "";
             for (int i = 0; i < str.Length; i += 4)
             {
@@ -413,50 +293,183 @@ namespace WZToolLib.Utility.Transformer
                         break;
                 }
             }
+
             return text;
         }
 
-        public static string IntegerToStr(int length)
+        public static string HexStr2BCD(string retValue, int length)
         {
-            string[] array = new string[3];
-            array[0] = (length & 255).ToString("X2");
-            for (int i = 1; i < 3; i++)
+            List<byte> list = new List<byte>();
+            long num = Convert.ToInt64(retValue, 16);
+            for (int i = length - 1; i >= 0; i--)
             {
-                length >>= 8;
-                array[i] = (length & 255).ToString("X2");
+                long num2 = num % 10L;
+                list.Add(Convert.ToByte((num2 / 10L << 4) + (num2 % 10L & 15L)));
+                num /= 100L;
             }
-            return array[2] + array[1] + array[0];
+
+            return TransferHelepr.ToHexString(list.ToArray());
         }
 
-        public static string StrTo16Hex(string str)
+        public static string HexStr2BCD_Standard(string retValue, int length)
         {
-            string text = "";
-            string result;
-            if (str == "")
+            string text = string.Empty;
+            string value = string.Empty;
+            for (int i = 0; i < length; i++)
             {
-                result = "";
+                value = retValue.Substring(i, 1);
+                int num = Convert.ToInt32(value, 16);
+                text += (num / 10 * 10 + num % 10).ToString();
+            }
+
+            return text;
+        }
+
+        public static byte[] HexStr2Byte(string strValue)
+        {
+            if (strValue.IndexOf("x") == 1)
+            {
+                strValue = strValue.Substring(2);
+            }
+
+            int num = strValue.Length / 2;
+            List<byte> list = new List<byte>();
+            for (int i = 0; i < num; i++)
+            {
+                byte item = (byte)Convert.ToInt32(strValue.Substring(i * 2, 2), 16);
+                list.Add(item);
+            }
+
+            return list.ToArray();
+        }
+
+        public static byte[] HexStr2Byte(string strValue, int maxLength)
+        {
+            if (strValue.IndexOf("x") == 1)
+            {
+                strValue = strValue.Substring(2);
+            }
+
+            int length = strValue.Length;
+            byte[] result;
+            if (length > maxLength)
+            {
+                result = null;
             }
             else
             {
-                byte[] bytes = Encoding.Default.GetBytes(str);
-                for (int i = 0; i < bytes.Length; i++)
+                for (int i = 0; i < maxLength - length; i++)
                 {
-                    text += bytes[i].ToString("X");
+                    strValue = "0" + strValue;
                 }
-                result = text;
+
+                int num = strValue.Length / 2;
+                List<byte> list = new List<byte>();
+                for (int i = 0; i < num; i++)
+                {
+                    byte item = (byte)Convert.ToInt32(strValue.Substring(i * 2, 2), 16);
+                    list.Add(item);
+                }
+
+                byte[] array = list.ToArray();
+                result = array;
             }
+
             return result;
         }
 
-        public static string IntegerToStr(ulong intaddr)
+        public static double HexToFloat(string byteStr)
         {
-            string text = (intaddr & 255UL).ToString("X2");
+            double num = 0.0;
+            int value = Convert.ToInt32(byteStr, 16);
+            string text = Convert.ToString(value, 2);
+
+            for (int i = 0; i < 32; i++)
+            {
+                if (text.Length < i + 1)
+                {
+                    text = "0" + text;
+                }
+            }
+
+            double y = (text.Substring(0, 1) == "0") ? 0.0 : 1.0;
+            string value2 = text.Substring(1, 8);
+            double y2 = (double)(Convert.ToInt32(value2, 2) - 127);
+            double num2 = -1.0;
+
+            for (int i = 9; i < 32; i++)
+            {
+                if (text.Substring(i, 1) == "1")
+                {
+                    double num3 = 1.0;
+                    num += num3 * Math.Pow(2.0, num2);
+                }
+                num2 -= 1.0;
+            }
+
+            double value3 = Math.Pow(-1.0, y) * (1.0 + num) * Math.Pow(2.0, y2);
+            return Math.Round(value3, 2);
+        }
+
+        public static string IntegerToHexStr(int value)
+        {
+            string text = (value & 255).ToString("X2");
+
+            for (int i = 1; i < 4; i++)
+            {
+                value >>= 8;
+                text = (value & 255).ToString("X2") + text;
+            }
+
+            return text;
+        }
+
+        public static string IntegerToHexStr(ulong value)
+        {
+            string text = (value & 255UL).ToString("X2");
+
             for (int i = 1; i < 8; i++)
             {
-                intaddr >>= 8;
-                text = (intaddr & 255UL).ToString("X2") + text;
+                value >>= 8;
+                text = (value & 255UL).ToString("X2") + text;
             }
+
             return text;
+        }
+
+        public static string Reverse(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException("Invalid Argument");
+            }
+
+            StringBuilder stringBuilder = new StringBuilder(str.Length);
+            for (int i = str.Length - 1; i >= 0; i--)
+            {
+                stringBuilder.Append(str[i]);
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        public static string Reverse(string str, int mode)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException("Invalid Argument");
+            }
+
+            StringBuilder stringBuilder = new StringBuilder(str.Length);
+            for (int i = str.Length - 1; i >= 0; i -= mode)
+            {
+                for (int j = mode - 1; j >= 0; j--)
+                {
+                    stringBuilder.Append(str[i - j]);
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
