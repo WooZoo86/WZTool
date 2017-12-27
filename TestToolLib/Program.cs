@@ -11,7 +11,8 @@ namespace TestToolLib
     {
         static void Main(string[] args)
         {
-            if (!ZipHelper.UnZip("E:\\BaiduNetdiskDownload\\GoodSync-v10-Setup-Portable.zip"))
+            ZipHelper.Password = "123456";
+            if (!ZipHelper.ZipDir("E:\\BaiduNetdiskDownload", null))
                 Console.WriteLine(ZipHelper.ErrMsg);
             else
                 Console.WriteLine("Ok!");

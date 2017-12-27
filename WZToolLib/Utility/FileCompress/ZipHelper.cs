@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Checksums;
+
 
 namespace WZToolLib.Utility.FileCompress
 {
+    using ICSharpCode.SharpZipLib.Zip;
+    using ICSharpCode.SharpZipLib.Checksums;
+
     public class ZipHelper
     {
         static ZipHelper()
@@ -52,7 +54,7 @@ namespace WZToolLib.Utility.FileCompress
 
             if (string.IsNullOrEmpty(ZipedFile))
             {
-                ZipedFile = Path.GetFileNameWithoutExtension(FileToZip) + ".zip";
+                ZipedFile = Path.GetDirectoryName(FileToZip) + "\\" + Path.GetFileNameWithoutExtension(FileToZip) + ".zip";
             }
 
             if (0 != string.Compare(Path.GetExtension(ZipedFile), ".zip", StringComparison.OrdinalIgnoreCase))
@@ -72,9 +74,9 @@ namespace WZToolLib.Utility.FileCompress
                             string filename = FileToZip.Substring(FileToZip.LastIndexOf('\\') + 1);
                             ZipEntry ZipEntry = new ZipEntry(filename);
 
-                            ZipStream.PutNextEntry(ZipEntry);
                             ZipStream.SetLevel(ZipHelper.Level);
                             ZipStream.Password = ZipHelper.Password;
+                            ZipStream.PutNextEntry(ZipEntry);
 
                             byte[] buffer = new byte[ZipHelper.Block];
                             int sizeRead = 0;
@@ -111,17 +113,18 @@ namespace WZToolLib.Utility.FileCompress
             return Result;
         }
 
-        public static bool ZipDirectory(string DirectoryToZip, string ZipedFile = null)
+        public static bool ZipDir(string DirToZip, string ZipedFile = null)
         {
-            if (!System.IO.Directory.Exists(DirectoryToZip))
+            DirToZip = DirToZip.EndsWith("\\") ? DirToZip : DirToZip + "\\";
+            if (!System.IO.Directory.Exists(DirToZip))
             {
-                ZipHelper.ErrMsg = "[ZipDirectory] (" + DirectoryToZip + ") can not be found!";
+                ZipHelper.ErrMsg = "[ZipDirectory] (" + DirToZip + ") can not be found!";
                 return false;
             }
 
             if (string.IsNullOrEmpty(ZipedFile))
             {
-                ZipedFile = Path.GetFileNameWithoutExtension(DirectoryToZip) + ".zip";
+                ZipedFile = Path.GetDirectoryName(DirToZip) + ".zip";
             }
 
             if (0 != string.Compare(Path.GetExtension(ZipedFile), ".zip", StringComparison.OrdinalIgnoreCase))
@@ -129,7 +132,6 @@ namespace WZToolLib.Utility.FileCompress
                 ZipedFile = ZipedFile + ".zip";
             }
 
-            //string ZipFileName = string.IsNullOrEmpty(ZipedFileName) ? ZipedPath + "\\" + new DirectoryInfo(DirectoryToZip).Name + ".zip" : ZipedPath + "\\" + ZipedFileName + ".zip";
             bool Result = true;
             try
             {
@@ -138,13 +140,17 @@ namespace WZToolLib.Utility.FileCompress
                     using (ZipOutputStream ZipOut = new ZipOutputStream(ZipFile))
                     {
                         ZipOut.Password = ZipHelper.Password;
-                        ZipSubDir(DirectoryToZip, ZipOut, "");
+                        ZipOut.SetLevel(ZipHelper.Level);
+
+                        ZipSubDir(DirToZip, ZipOut, "");
+                        ZipOut.Finish();
+                        ZipOut.Close();
                     }
                 }
             }
             catch (Exception ex)
             {
-                ZipHelper.ErrMsg = "[ZipDirectory] (" + DirectoryToZip + ") get exception {" + ex.Message + "}";
+                ZipHelper.ErrMsg = "[ZipDirectory] (" + DirToZip + ") get exception {" + ex.Message + "}";
                 Result = false;
             }
 
@@ -160,15 +166,19 @@ namespace WZToolLib.Utility.FileCompress
 
             Crc32 crc = new Crc32();
 
+            ZipEntry entry = new ZipEntry(Path.GetDirectoryName(strDirectory) + "/");
+            ZipOut.PutNextEntry(entry);
+            ZipOut.Flush();
+
             string[] filenames = Directory.GetFileSystemEntries(strDirectory);
             foreach (string file in filenames)
             {
                 if (Directory.Exists(file))
                 {
-                    string subPath = parentPath;
-                    subPath += file.Substring(file.LastIndexOf("\\") + 1);
-                    subPath += "\\";
-                    ZipSubDir(file, ZipOut, subPath);
+                    string curPath = parentPath;
+                    curPath += file.Substring(file.LastIndexOf("\\") + 1);
+                    curPath += "\\";
+                    ZipSubDir(file, ZipOut, curPath);
                 }
                 else 
                 {
@@ -180,7 +190,7 @@ namespace WZToolLib.Utility.FileCompress
                             fs.Read(buffer, 0, buffer.Length);
 
                             string fileName = parentPath + file.Substring(file.LastIndexOf("\\") + 1);
-                            ZipEntry entry = new ZipEntry(fileName);
+                            entry = new ZipEntry(fileName);
 
                             entry.DateTime = DateTime.Now;
                             entry.Size = fs.Length;
@@ -215,7 +225,7 @@ namespace WZToolLib.Utility.FileCompress
             string RootDir = string.Empty;
             if (string.IsNullOrEmpty(TargetDir))
             {
-                RootDir = "\\";
+                RootDir = Path.GetDirectoryName(ZipFile) + "\\"; 
             }
             else
             {
