@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
+using System.Collections;
 using System.IO;
+using System.DrawingCore;
 
 
 namespace WZToolLib.FileManager.Graph
@@ -19,7 +18,7 @@ namespace WZToolLib.FileManager.Graph
 
             return this.delay;
         }
-
+        
         public int GetFrameCount()
         {
             return this.frameCount;
@@ -52,6 +51,7 @@ namespace WZToolLib.FileManager.Graph
                     num++;
                 }
             }
+
             return array;
         }
 
@@ -101,6 +101,7 @@ namespace WZToolLib.FileManager.Graph
                         {
                             color = Color.FromArgb(this.lastBgColor);
                         }
+
                         Brush brush = new SolidBrush(color);
                         graphics.FillRectangle(brush, this.lastRect);
                         brush.Dispose();
@@ -108,9 +109,11 @@ namespace WZToolLib.FileManager.Graph
                     }
                 }
             }
+
             int num2 = 1;
             int num3 = 8;
             int num4 = 0;
+
             for (int i = 0; i < this.ih; i++)
             {
                 int num5 = i;
@@ -134,9 +137,11 @@ namespace WZToolLib.FileManager.Graph
                                 break;
                         }
                     }
+
                     num5 = num4;
                     num4 += num3;
                 }
+
                 num5 += this.iy;
                 if (num5 < this.height)
                 {
@@ -147,6 +152,7 @@ namespace WZToolLib.FileManager.Graph
                     {
                         num7 = num6 + this.width;
                     }
+
                     int num8 = i * this.iw;
                     while (j < num7)
                     {
@@ -156,10 +162,12 @@ namespace WZToolLib.FileManager.Graph
                         {
                             array[j] = num10;
                         }
+
                         j++;
                     }
                 }
             }
+
             this.SetPixels(array);
         }
 
@@ -170,6 +178,7 @@ namespace WZToolLib.FileManager.Graph
             {
                 result = ((GifDecoder.GifFrame)this.frames[n]).image;
             }
+
             return result;
         }
 
@@ -193,12 +202,14 @@ namespace WZToolLib.FileManager.Graph
                         this.status = GifDecoder.STATUS_FORMAT_ERROR;
                     }
                 }
+
                 inStream.Close();
             }
             else
             {
                 this.status = GifDecoder.STATUS_OPEN_ERROR;
             }
+
             return this.status;
         }
 
@@ -214,6 +225,7 @@ namespace WZToolLib.FileManager.Graph
             {
                 this.status = GifDecoder.STATUS_OPEN_ERROR;
             }
+
             return this.status;
         }
 
@@ -225,18 +237,22 @@ namespace WZToolLib.FileManager.Graph
             {
                 this.pixels = new byte[num2];
             }
+
             if (this.prefix == null)
             {
                 this.prefix = new short[GifDecoder.MaxStackSize];
             }
+
             if (this.suffix == null)
             {
                 this.suffix = new byte[GifDecoder.MaxStackSize];
             }
+
             if (this.pixelStack == null)
             {
                 this.pixelStack = new byte[GifDecoder.MaxStackSize + 1];
             }
+
             int num3 = this.Read();
             int num4 = 1 << num3;
             int num5 = num4 + 1;
@@ -244,11 +260,13 @@ namespace WZToolLib.FileManager.Graph
             int num7 = num;
             int num8 = num3 + 1;
             int num9 = (1 << num8) - 1;
+
             for (int i = 0; i < num4; i++)
             {
                 this.prefix[i] = 0;
                 this.suffix[i] = (byte)i;
             }
+
             int num16;
             int num15;
             int num14;
@@ -271,12 +289,14 @@ namespace WZToolLib.FileManager.Graph
                             }
                             num16 = 0;
                         }
+
                         num11 += (int)(this.block[num16] & byte.MaxValue) << num10;
                         num10 += 8;
                         num16++;
                         num12--;
                         continue;
                     }
+
                     int i = num11 & num9;
                     num11 >>= num8;
                     num10 -= num8;
@@ -284,6 +304,7 @@ namespace WZToolLib.FileManager.Graph
                     {
                         break;
                     }
+
                     if (i == num4)
                     {
                         num8 = num3 + 1;
@@ -292,6 +313,7 @@ namespace WZToolLib.FileManager.Graph
                         num7 = num;
                         continue;
                     }
+
                     if (num7 == num)
                     {
                         this.pixelStack[num14++] = this.suffix[i];
@@ -299,36 +321,44 @@ namespace WZToolLib.FileManager.Graph
                         num13 = i;
                         continue;
                     }
+
                     int num17 = i;
                     if (i == num6)
                     {
                         this.pixelStack[num14++] = (byte)num13;
                         i = num7;
                     }
+
                     while (i > num4)
                     {
                         this.pixelStack[num14++] = this.suffix[i];
                         i = (int)this.prefix[i];
                     }
+
                     num13 = (int)(this.suffix[i] & byte.MaxValue);
                     if (num6 >= GifDecoder.MaxStackSize)
                     {
                         break;
                     }
+
                     this.pixelStack[num14++] = (byte)num13;
                     this.prefix[num6] = (short)num7;
                     this.suffix[num6] = (byte)num13;
                     num6++;
+
                     if ((num6 & num9) == 0 && num6 < GifDecoder.MaxStackSize)
                     {
                         num8++;
                         num9 += num6;
                     }
+
                     num7 = num17;
                 }
+
                 num14--;
                 this.pixels[num15++] = this.pixelStack[num14];
             }
+
             for (int j = num15; j < num2; j++)
             {
                 this.pixels[j] = 0;
@@ -360,6 +390,7 @@ namespace WZToolLib.FileManager.Graph
             {
                 this.status = GifDecoder.STATUS_FORMAT_ERROR;
             }
+
             return result;
         }
 
@@ -378,17 +409,20 @@ namespace WZToolLib.FileManager.Graph
                         {
                             break;
                         }
+
                         i += num;
                     }
                 }
                 catch (IOException ex)
                 {
                 }
+
                 if (i < this.blockSize)
                 {
                     this.status = GifDecoder.STATUS_FORMAT_ERROR;
                 }
             }
+
             return i;
         }
 
@@ -398,6 +432,7 @@ namespace WZToolLib.FileManager.Graph
             int[] array = null;
             byte[] array2 = new byte[num];
             int num2 = 0;
+
             try
             {
                 num2 = this.inStream.Read(array2, 0, array2.Length);
@@ -405,6 +440,7 @@ namespace WZToolLib.FileManager.Graph
             catch (IOException ex)
             {
             }
+
             if (num2 < num)
             {
                 this.status = GifDecoder.STATUS_FORMAT_ERROR;
@@ -414,14 +450,18 @@ namespace WZToolLib.FileManager.Graph
                 array = new int[256];
                 int i = 0;
                 int num3 = 0;
-                while (i < ncolors)
+                unchecked
                 {
-                    int num4 = (int)(array2[num3++] & byte.MaxValue);
-                    int num5 = (int)(array2[num3++] & byte.MaxValue);
-                    int num6 = (int)(array2[num3++] & byte.MaxValue);
-                    array[i++] = (int)((ulong)-16777216 | (ulong)((long)((long)num4 << 16)) | (ulong)((long)((long)num5 << 8)) | (ulong)((long)num6));
+                    while (i < ncolors)
+                    {
+                        int num4 = (int)(array2[num3++] & byte.MaxValue);
+                        int num5 = (int)(array2[num3++] & byte.MaxValue);
+                        int num6 = (int)(array2[num3++] & byte.MaxValue);
+                        array[i++] = (int)((ulong)-16777216 | (ulong)((long)((long)num4 << 16)) | (ulong)((long)((long)num5 << 8)) | (ulong)((long)num6));
+                    }
                 }
             }
+
             return array;
         }
 
@@ -440,6 +480,7 @@ namespace WZToolLib.FileManager.Graph
                         {
                             goto IL_E2;
                         }
+
                         num = this.Read();
                         num2 = num;
                         if (num2 != 249)
@@ -456,6 +497,7 @@ namespace WZToolLib.FileManager.Graph
                                 {
                                     text += (char)this.block[i];
                                 }
+
                                 if (text.Equals("NETSCAPE2.0"))
                                 {
                                     this.ReadNetscapeExt();
@@ -478,12 +520,14 @@ namespace WZToolLib.FileManager.Graph
                     {
                         goto IL_E2;
                     }
+
                     flag = true;
                 }
                 else
                 {
                     this.ReadImage();
                 }
+
                 continue;
                 IL_E2:
                 this.status = GifDecoder.STATUS_FORMAT_ERROR;
@@ -495,10 +539,12 @@ namespace WZToolLib.FileManager.Graph
             this.Read();
             int num = this.Read();
             this.dispose = (num & 28) >> 2;
+
             if (this.dispose == 0)
             {
                 this.dispose = 1;
             }
+
             this.transparency = ((num & 1) != 0);
             this.delay = this.ReadShort() * 10;
             this.transIndex = this.Read();
@@ -512,6 +558,7 @@ namespace WZToolLib.FileManager.Graph
             {
                 text += (char)this.Read();
             }
+
             if (!text.StartsWith("GIF"))
             {
                 this.status = GifDecoder.STATUS_FORMAT_ERROR;
@@ -534,6 +581,7 @@ namespace WZToolLib.FileManager.Graph
             this.iw = this.ReadShort();
             this.ih = this.ReadShort();
             int num = this.Read();
+
             this.lctFlag = ((num & 128) != 0);
             this.interlace = ((num & 64) != 0);
             this.lctSize = 2 << (num & 7);
@@ -550,16 +598,19 @@ namespace WZToolLib.FileManager.Graph
                     this.bgColor = 0;
                 }
             }
+
             int num2 = 0;
             if (this.transparency)
             {
                 num2 = this.act[this.transIndex];
                 this.act[this.transIndex] = 0;
             }
+
             if (this.act == null)
             {
                 this.status = GifDecoder.STATUS_FORMAT_ERROR;
             }
+
             if (!this.Error())
             {
                 this.DecodeImageData();
