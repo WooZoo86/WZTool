@@ -85,6 +85,7 @@ namespace WZToolLib.FileManager.Graph
                         this.lastImage = null;
                     }
                 }
+
                 if (this.lastImage != null)
                 {
                     int[] sourceArray = this.GetPixels(new Bitmap(this.lastImage));
